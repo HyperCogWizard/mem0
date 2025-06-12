@@ -1,0 +1,420 @@
+---
+title: Memory Lifecycle States
+description: 'State diagrams showing memory lifecycle and cognitive state transitions'
+icon: "circle-nodes"
+iconType: "solid"
+---
+
+# Memory Lifecycle States
+
+This document provides comprehensive state diagrams that model the lifecycle of memories and cognitive state transitions within Mem0's architecture.
+
+## Memory Entity Lifecycle
+
+The following state diagram shows the complete lifecycle of a memory entity from creation to deletion:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Input_Received
+    Input_Received --> Parsing
+    Parsing --> Fact_Extraction
+    Fact_Extraction --> Memory_Formation
+    
+    Memory_Formation --> Vector_Processing
+    Memory_Formation --> Graph_Processing
+    Memory_Formation --> Procedural_Processing
+    
+    Vector_Processing --> Vector_Stored
+    Graph_Processing --> Graph_Stored
+    Procedural_Processing --> Procedural_Stored
+    
+    Vector_Stored --> Active_Memory
+    Graph_Stored --> Active_Memory
+    Procedural_Stored --> Active_Memory
+    
+    Active_Memory --> Searching
+    Active_Memory --> Updating
+    Active_Memory --> Archiving
+    
+    Searching --> Active_Memory
+    
+    Updating --> Memory_Validation
+    Memory_Validation --> Conflict_Resolution
+    Conflict_Resolution --> Memory_Merge
+    Conflict_Resolution --> Memory_Split
+    Conflict_Resolution --> Memory_Replace
+    
+    Memory_Merge --> Active_Memory
+    Memory_Split --> Active_Memory
+    Memory_Replace --> Active_Memory
+    
+    Archiving --> Archived
+    Archived --> Reactivation
+    Archived --> Deletion
+    
+    Reactivation --> Active_Memory
+    Deletion --> [*]
+    
+    note right of Memory_Formation
+        Cognitive kernel processes
+        raw facts into structured
+        memory representations
+    end note
+    
+    note right of Conflict_Resolution
+        Neural-symbolic integration
+        resolves contradictions using
+        temporal and semantic analysis
+    end note
+    
+    note right of Active_Memory
+        Primary state for memory
+        retrieval and interaction
+        with attention allocation
+    end note
+```
+
+## Graph Memory State Transitions
+
+This diagram models the specific state transitions for graph-based memory entities:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Entity_Candidate
+    Entity_Candidate --> Entity_Extraction
+    Entity_Extraction --> Entity_Validation
+    
+    Entity_Validation --> Valid_Entity
+    Entity_Validation --> Invalid_Entity
+    
+    Invalid_Entity --> [*]
+    
+    Valid_Entity --> Similarity_Check
+    Similarity_Check --> New_Entity
+    Similarity_Check --> Existing_Entity_Match
+    
+    New_Entity --> Relationship_Discovery
+    Existing_Entity_Match --> Relationship_Update
+    
+    Relationship_Discovery --> Relationship_Validation
+    Relationship_Update --> Relationship_Validation
+    
+    Relationship_Validation --> Valid_Relationship
+    Relationship_Validation --> Invalid_Relationship
+    
+    Invalid_Relationship --> Entity_Isolated
+    Valid_Relationship --> Graph_Integration
+    
+    Graph_Integration --> Connected_Entity
+    Entity_Isolated --> Connected_Entity
+    
+    Connected_Entity --> Query_Available
+    Query_Available --> Relationship_Traversal
+    Query_Available --> Entity_Update
+    Query_Available --> Entity_Deletion
+    
+    Relationship_Traversal --> Query_Available
+    Entity_Update --> Similarity_Check
+    Entity_Deletion --> [*]
+    
+    note right of Similarity_Check
+        Vector embeddings and
+        BM25 search determine
+        entity uniqueness
+    end note
+    
+    note right of Graph_Integration
+        Hypergraph pattern encoding
+        creates emergent relationship
+        structures
+    end note
+```
+
+## Vector Memory State Management
+
+This state diagram illustrates the lifecycle of vector-based memories:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Text_Input
+    Text_Input --> Embedding_Generation
+    Embedding_Generation --> Embedding_Validation
+    
+    Embedding_Validation --> Valid_Embedding
+    Embedding_Validation --> Embedding_Error
+    
+    Embedding_Error --> Fallback_Embedding
+    Embedding_Error --> [*]
+    
+    Fallback_Embedding --> Valid_Embedding
+    
+    Valid_Embedding --> Dimension_Check
+    Dimension_Check --> Compatible_Dimensions
+    Dimension_Check --> Incompatible_Dimensions
+    
+    Incompatible_Dimensions --> Dimension_Adjustment
+    Dimension_Adjustment --> Compatible_Dimensions
+    
+    Compatible_Dimensions --> Vector_Storage
+    Vector_Storage --> Indexed_Vector
+    
+    Indexed_Vector --> Search_Ready
+    Search_Ready --> Similarity_Search
+    Search_Ready --> Vector_Update
+    Search_Ready --> Vector_Archival
+    
+    Similarity_Search --> Similarity_Scoring
+    Similarity_Scoring --> Relevance_Ranking
+    Relevance_Ranking --> Search_Ready
+    
+    Vector_Update --> Embedding_Generation
+    Vector_Archival --> Archived_Vector
+    
+    Archived_Vector --> Vector_Retrieval
+    Archived_Vector --> Vector_Deletion
+    
+    Vector_Retrieval --> Search_Ready
+    Vector_Deletion --> [*]
+    
+    note right of Similarity_Scoring
+        Adaptive attention allocation
+        adjusts similarity thresholds
+        based on context
+    end note
+    
+    note right of Relevance_Ranking
+        Temporal awareness and
+        semantic coherence influence
+        final ranking scores
+    end note
+```
+
+## Cognitive Processing States
+
+This diagram models the cognitive processing states that drive memory operations:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Attention_Idle
+    Attention_Idle --> Context_Activation
+    Context_Activation --> Working_Memory_Load
+    
+    Working_Memory_Load --> Attention_Allocation
+    Attention_Allocation --> Pattern_Recognition
+    
+    Pattern_Recognition --> Known_Pattern
+    Pattern_Recognition --> Novel_Pattern
+    Pattern_Recognition --> Ambiguous_Pattern
+    
+    Known_Pattern --> Memory_Retrieval
+    Novel_Pattern --> Learning_Mode
+    Ambiguous_Pattern --> Disambiguation
+    
+    Disambiguation --> Pattern_Clarification
+    Pattern_Clarification --> Known_Pattern
+    Pattern_Clarification --> Novel_Pattern
+    
+    Memory_Retrieval --> Context_Assembly
+    Learning_Mode --> Memory_Formation
+    
+    Memory_Formation --> Context_Assembly
+    Context_Assembly --> Response_Generation
+    
+    Response_Generation --> Feedback_Integration
+    Feedback_Integration --> Cognitive_Update
+    
+    Cognitive_Update --> Pattern_Reinforcement
+    Cognitive_Update --> Pattern_Adjustment
+    
+    Pattern_Reinforcement --> Attention_Idle
+    Pattern_Adjustment --> Attention_Idle
+    
+    note right of Attention_Allocation
+        Dynamic resource allocation
+        based on context importance
+        and memory relevance
+    end note
+    
+    note right of Learning_Mode
+        Recursive memory formation
+        creates emergent cognitive
+        patterns
+    end note
+```
+
+## Multi-Session State Coordination
+
+This diagram shows how states are coordinated across multiple concurrent sessions:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Session_Manager_Idle
+    Session_Manager_Idle --> Session_Creation
+    
+    Session_Creation --> User_Session
+    Session_Creation --> Agent_Session
+    Session_Creation --> Run_Session
+    
+    state User_Session {
+        [*] --> User_Context_Load
+        User_Context_Load --> User_Memory_Active
+        User_Memory_Active --> User_Operation
+        User_Operation --> User_Memory_Active
+        User_Memory_Active --> User_Session_End
+        User_Session_End --> [*]
+    }
+    
+    state Agent_Session {
+        [*] --> Agent_Context_Load
+        Agent_Context_Load --> Agent_Memory_Active
+        Agent_Memory_Active --> Procedural_Operation
+        Procedural_Operation --> Agent_Memory_Active
+        Agent_Memory_Active --> Agent_Session_End
+        Agent_Session_End --> [*]
+    }
+    
+    state Run_Session {
+        [*] --> Run_Context_Load
+        Run_Context_Load --> Run_Memory_Active
+        Run_Memory_Active --> Batch_Operation
+        Batch_Operation --> Run_Memory_Active
+        Run_Memory_Active --> Run_Session_End
+        Run_Session_End --> [*]
+    }
+    
+    User_Session --> Session_Synchronization
+    Agent_Session --> Session_Synchronization
+    Run_Session --> Session_Synchronization
+    
+    Session_Synchronization --> Context_Merge
+    Context_Merge --> Cross_Session_Update
+    Cross_Session_Update --> Session_Manager_Idle
+    
+    note right of Session_Synchronization
+        Ensures consistency across
+        concurrent memory operations
+        from different session types
+    end note
+```
+
+## Error State Management
+
+This state diagram models error handling and recovery states:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Normal_Operation
+    Normal_Operation --> Error_Detected
+    Normal_Operation --> Success_State
+    
+    Success_State --> Normal_Operation
+    
+    Error_Detected --> Error_Classification
+    Error_Classification --> Transient_Error
+    Error_Classification --> Configuration_Error
+    Error_Classification --> Provider_Error
+    Error_Classification --> Data_Error
+    
+    Transient_Error --> Retry_Logic
+    Retry_Logic --> Exponential_Backoff
+    Exponential_Backoff --> Retry_Attempt
+    Retry_Attempt --> Normal_Operation
+    Retry_Attempt --> Max_Retries_Exceeded
+    
+    Max_Retries_Exceeded --> Fallback_Provider
+    Fallback_Provider --> Provider_Switch
+    Provider_Switch --> Normal_Operation
+    Provider_Switch --> Critical_Failure
+    
+    Configuration_Error --> Config_Validation
+    Config_Validation --> Config_Repair
+    Config_Repair --> Normal_Operation
+    Config_Repair --> Manual_Intervention
+    
+    Provider_Error --> Provider_Health_Check
+    Provider_Health_Check --> Provider_Recovery
+    Provider_Health_Check --> Fallback_Provider
+    
+    Provider_Recovery --> Normal_Operation
+    
+    Data_Error --> Data_Validation
+    Data_Validation --> Data_Sanitization
+    Data_Validation --> Data_Rejection
+    
+    Data_Sanitization --> Normal_Operation
+    Data_Rejection --> Error_Response
+    
+    Manual_Intervention --> [*]
+    Critical_Failure --> [*]
+    Error_Response --> [*]
+    
+    note right of Error_Classification
+        Intelligent error categorization
+        enables appropriate recovery
+        strategies
+    end note
+    
+    note right of Fallback_Provider
+        Redundant provider support
+        ensures system resilience
+    end note
+```
+
+## Memory Consistency States
+
+This final diagram shows the states involved in maintaining consistency across storage backends:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Consistency_Check_Start
+    Consistency_Check_Start --> Vector_State_Check
+    Consistency_Check_Start --> Graph_State_Check
+    Consistency_Check_Start --> Metadata_State_Check
+    
+    Vector_State_Check --> Vector_Consistent
+    Vector_State_Check --> Vector_Inconsistent
+    
+    Graph_State_Check --> Graph_Consistent
+    Graph_State_Check --> Graph_Inconsistent
+    
+    Metadata_State_Check --> Metadata_Consistent
+    Metadata_State_Check --> Metadata_Inconsistent
+    
+    Vector_Consistent --> State_Comparison
+    Graph_Consistent --> State_Comparison
+    Metadata_Consistent --> State_Comparison
+    
+    Vector_Inconsistent --> Vector_Repair
+    Graph_Inconsistent --> Graph_Repair
+    Metadata_Inconsistent --> Metadata_Repair
+    
+    Vector_Repair --> Vector_Consistent
+    Graph_Repair --> Graph_Consistent
+    Metadata_Repair --> Metadata_Consistent
+    
+    State_Comparison --> All_States_Consistent
+    State_Comparison --> Cross_Store_Inconsistency
+    
+    All_States_Consistent --> Consistency_Validated
+    Cross_Store_Inconsistency --> Conflict_Resolution
+    
+    Conflict_Resolution --> Authoritative_Source_Selection
+    Authoritative_Source_Selection --> State_Synchronization
+    State_Synchronization --> All_States_Consistent
+    
+    Consistency_Validated --> [*]
+    
+    note right of State_Comparison
+        Cross-storage validation
+        ensures hypergraph coherence
+        across all backends
+    end note
+    
+    note right of Conflict_Resolution
+        Temporal and semantic
+        analysis resolves conflicts
+        while preserving data integrity
+    end note
+```
+
+These state diagrams capture the dynamic nature of Mem0's cognitive architecture, showing how memories evolve through their lifecycle and how the system maintains coherence across multiple concurrent operations. The recursive patterns and emergent behaviors emerge from these state transitions, creating the adaptive intelligence that characterizes the system.

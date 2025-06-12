@@ -36,6 +36,18 @@
                 ]
               },
               {
+                "group": "Architecture",
+                "icon": "sitemap",
+                "pages": [
+                  "architecture/index",
+                  "architecture/overview",
+                  "architecture/component-interactions",
+                  "architecture/data-flow-sequences",
+                  "architecture/memory-lifecycle-states",
+                  "architecture/implementation-patterns"
+                ]
+              },
+              {
                 "group": "Platform",
                 "icon": "cogs",
                 "pages": [

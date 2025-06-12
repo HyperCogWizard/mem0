@@ -1,0 +1,196 @@
+---
+title: Architecture Overview
+description: 'Comprehensive architecture documentation with interactive diagrams'
+icon: "network-wired"
+iconType: "solid"
+---
+
+# Mem0 Architecture Overview
+
+Mem0 is a sophisticated memory layer for AI applications that enables persistent, personalized, and context-aware interactions. The architecture is designed around hypergraph-centric principles with emergent cognitive patterns and neural-symbolic integration points.
+
+## System Architecture
+
+The following diagram illustrates the high-level system architecture, showing the principal flows and cognitive subsystems:
+
+```mermaid
+graph TD
+    subgraph "Client Layer"
+        CLI[Client API]
+        SDK[SDK Layer]
+        HTTP[HTTP Client]
+    end
+    
+    subgraph "Memory Core"
+        MC[Memory Controller]
+        MM[Memory Manager]
+        MS[Memory Storage]
+    end
+    
+    subgraph "Processing Pipeline"
+        LLM[LLM Providers]
+        EMB[Embedding Models]
+        VEC[Vector Processors]
+    end
+    
+    subgraph "Storage Systems"
+        VS[Vector Stores]
+        GS[Graph Stores]
+        SQL[SQLite Storage]
+    end
+    
+    subgraph "Memory Types"
+        VM[Vector Memory]
+        GM[Graph Memory]
+        PM[Procedural Memory]
+    end
+    
+    CLI --> MC
+    SDK --> MC
+    HTTP --> MC
+    
+    MC --> MM
+    MM --> MS
+    
+    MM --> LLM
+    MM --> EMB
+    MM --> VEC
+    
+    EMB --> VS
+    LLM --> GS
+    MS --> SQL
+    
+    MM --> VM
+    MM --> GM
+    MM --> PM
+    
+    VM --> VS
+    GM --> GS
+    PM --> SQL
+    
+    classDef clientLayer fill:#e1f5fe
+    classDef memoryCore fill:#f3e5f5
+    classDef processing fill:#e8f5e8
+    classDef storage fill:#fff3e0
+    classDef memoryTypes fill:#fce4ec
+    
+    class CLI,SDK,HTTP clientLayer
+    class MC,MM,MS memoryCore
+    class LLM,EMB,VEC processing
+    class VS,GS,SQL storage
+    class VM,GM,PM memoryTypes
+```
+
+## Cognitive Flow Architecture
+
+This diagram shows the recursive and emergent cognitive patterns within the system:
+
+```mermaid
+graph LR
+    subgraph "Input Processing"
+        IN[Input Messages]
+        PARSE[Message Parser]
+        FACT[Fact Extraction]
+    end
+    
+    subgraph "Cognitive Kernel"
+        ATTN[Attention Allocation]
+        CTX[Context Assembly]
+        MEM[Memory Formation]
+    end
+    
+    subgraph "Neural-Symbolic Integration"
+        VEC_PROC[Vector Processing]
+        GRAPH_PROC[Graph Processing]
+        SYM_REASON[Symbolic Reasoning]
+    end
+    
+    subgraph "Adaptive Memory"
+        STORE[Memory Storage]
+        RETRIEVE[Memory Retrieval]
+        UPDATE[Memory Update]
+    end
+    
+    subgraph "Output Generation"
+        SYNTH[Memory Synthesis]
+        RESP[Response Formation]
+        OUT[Output]
+    end
+    
+    IN --> PARSE
+    PARSE --> FACT
+    FACT --> ATTN
+    
+    ATTN --> CTX
+    CTX --> MEM
+    
+    MEM --> VEC_PROC
+    MEM --> GRAPH_PROC
+    MEM --> SYM_REASON
+    
+    VEC_PROC --> STORE
+    GRAPH_PROC --> STORE
+    SYM_REASON --> STORE
+    
+    STORE --> RETRIEVE
+    RETRIEVE --> UPDATE
+    UPDATE --> STORE
+    
+    RETRIEVE --> SYNTH
+    SYNTH --> RESP
+    RESP --> OUT
+    
+    classDef input fill:#e3f2fd
+    classDef cognitive fill:#f1f8e9
+    classDef neural fill:#fff8e1
+    classDef adaptive fill:#fce4ec
+    classDef output fill:#e8eaf6
+    
+    class IN,PARSE,FACT input
+    class ATTN,CTX,MEM cognitive
+    class VEC_PROC,GRAPH_PROC,SYM_REASON neural
+    class STORE,RETRIEVE,UPDATE adaptive
+    class SYNTH,RESP,OUT output
+```
+
+## Key Architectural Principles
+
+### 1. Multi-Level Memory Hierarchy
+- **Vector Memory**: Semantic similarity-based retrieval using high-dimensional embeddings
+- **Graph Memory**: Relationship-aware storage enabling complex entity interactions
+- **Procedural Memory**: Process and workflow storage for agent behaviors
+
+### 2. Hypergraph Pattern Encoding
+The system employs hypergraph structures to represent complex relationships between entities, enabling:
+- Multi-dimensional relationship modeling
+- Emergent pattern recognition
+- Recursive memory formation and retrieval
+
+### 3. Adaptive Attention Allocation
+Dynamic attention mechanisms optimize memory formation and retrieval:
+- Context-aware relevance scoring
+- Temporal awareness for memory freshness
+- Semantic coherence maintenance
+
+### 4. Neural-Symbolic Integration
+The architecture bridges neural (vector-based) and symbolic (graph-based) approaches:
+- Vector embeddings capture semantic similarity
+- Graph structures encode explicit relationships
+- Symbolic reasoning enables logical inference
+
+## Implementation Layers
+
+The system is implemented across multiple programming languages and environments:
+
+- **Python Core**: Primary implementation with full feature support
+- **TypeScript SDK**: Client-side implementation for web applications
+- **REST API**: Platform-agnostic HTTP interface
+- **CLI Tools**: Command-line interface for development and testing
+
+## Performance Characteristics
+
+- **+26% Accuracy** over OpenAI Memory on the LOCOMO benchmark
+- **91% Faster Responses** than full-context approaches
+- **90% Lower Token Usage** compared to traditional context management
+
+This architecture enables scalable, efficient, and intelligent memory management for AI applications while maintaining the flexibility to adapt to emerging cognitive patterns and use cases.

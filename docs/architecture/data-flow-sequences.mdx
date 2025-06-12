@@ -1,0 +1,375 @@
+---
+title: Data Flow & Sequence Diagrams
+description: 'Detailed sequence diagrams showing data and signal propagation pathways'
+icon: "stream"
+iconType: "solid"
+---
+
+# Data Flow & Sequence Diagrams
+
+This document provides detailed sequence diagrams that illustrate data and signal propagation pathways through Mem0's cognitive architecture.
+
+## Memory Addition Sequence
+
+The following sequence diagram shows the complete flow for adding a new memory to the system:
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Memory as Memory Controller
+    participant Parser as Message Parser
+    participant LLM as LLM Provider
+    participant Embedder as Embedding Model
+    participant VectorStore as Vector Store
+    participant GraphStore as Graph Store
+    participant Storage as SQLite Storage
+    
+    Client->>Memory: add(messages, user_id, metadata)
+    Memory->>Memory: _build_filters_and_metadata()
+    Memory->>Parser: parse_messages(messages)
+    Parser-->>Memory: parsed_messages
+    
+    alt Vision enabled
+        Memory->>Parser: parse_vision_messages()
+        Parser-->>Memory: vision_parsed_messages
+    end
+    
+    Memory->>LLM: generate_fact_extraction(messages)
+    LLM-->>Memory: extracted_facts
+    
+    Memory->>Memory: _create_memory_items(facts)
+    
+    par Vector Processing
+        Memory->>Embedder: embed(fact_text, "add")
+        Embedder-->>Memory: embedding_vector
+        Memory->>VectorStore: insert(vector, payload, id)
+        VectorStore-->>Memory: insertion_result
+    and Graph Processing
+        Memory->>LLM: extract_entities(facts)
+        LLM-->>Memory: entities
+        Memory->>LLM: extract_relations(facts, entities)
+        LLM-->>Memory: relations
+        Memory->>GraphStore: add_entities_relations(entities, relations)
+        GraphStore-->>Memory: graph_result
+    and Metadata Storage
+        Memory->>Storage: store_memory_metadata(memory_items)
+        Storage-->>Memory: storage_result
+    end
+    
+    Memory->>Memory: _format_response(results)
+    Memory-->>Client: response{results, relations}
+```
+
+## Memory Search Sequence
+
+This diagram illustrates the comprehensive search process across multiple memory types:
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Memory as Memory Controller
+    participant Embedder as Embedding Model
+    participant VectorStore as Vector Store
+    participant GraphMemory as Graph Memory
+    participant BM25 as BM25 Ranker
+    participant Synthesizer as Memory Synthesizer
+    
+    Client->>Memory: search(query, user_id, limit)
+    Memory->>Memory: _build_filters_and_metadata()
+    
+    par Vector Search
+        Memory->>Embedder: embed(query, "search")
+        Embedder-->>Memory: query_embedding
+        Memory->>VectorStore: search(query_embedding, filters, limit)
+        VectorStore-->>Memory: vector_results
+    and Graph Search
+        Memory->>GraphMemory: search(query, filters, limit)
+        GraphMemory->>GraphMemory: _extract_entities_from_query()
+        GraphMemory->>GraphMemory: _search_graph_db()
+        GraphMemory-->>Memory: graph_results
+    and Keyword Search
+        Memory->>BM25: search(query, limit)
+        BM25-->>Memory: keyword_results
+    end
+    
+    Memory->>Synthesizer: synthesize_results(vector_results, graph_results, keyword_results)
+    Synthesizer->>Synthesizer: rank_and_deduplicate()
+    Synthesizer->>Synthesizer: apply_temporal_weighting()
+    Synthesizer-->>Memory: synthesized_results
+    
+    Memory->>Memory: _format_search_response()
+    Memory-->>Client: response{memories, entities, score_details}
+```
+
+## Graph Memory Processing Sequence
+
+This sequence shows the specific processing for graph-based memory operations:
+
+```mermaid
+sequenceDiagram
+    participant Memory as Memory Controller
+    participant GraphMemory as Graph Memory
+    participant LLM as Structured LLM
+    participant Embedder as Embedding Model
+    participant Neo4j as Neo4j Database
+    participant BM25 as BM25 Search
+    
+    Memory->>GraphMemory: add(data, filters)
+    GraphMemory->>GraphMemory: _retrieve_nodes_from_data()
+    GraphMemory->>LLM: extract_entities(data)
+    LLM-->>GraphMemory: entities_with_types
+    
+    GraphMemory->>GraphMemory: _establish_nodes_relations_from_data()
+    GraphMemory->>LLM: extract_relations(data, entities)
+    LLM-->>GraphMemory: relations
+    
+    GraphMemory->>GraphMemory: _search_graph_db(entities)
+    
+    par Entity Embedding Search
+        GraphMemory->>Embedder: embed(entity_name)
+        Embedder-->>GraphMemory: entity_embedding
+        GraphMemory->>Neo4j: vector_similarity_search(embedding)
+        Neo4j-->>GraphMemory: similar_entities
+    and Keyword Search
+        GraphMemory->>BM25: search(entity_name)
+        BM25-->>GraphMemory: keyword_matches
+    end
+    
+    GraphMemory->>LLM: get_delete_entities(search_results, new_data)
+    LLM-->>GraphMemory: entities_to_delete
+    
+    GraphMemory->>Neo4j: delete_entities(entities_to_delete)
+    Neo4j-->>GraphMemory: delete_result
+    
+    GraphMemory->>Neo4j: add_entities(new_entities, relations)
+    Neo4j-->>GraphMemory: add_result
+    
+    GraphMemory-->>Memory: {deleted_entities, added_entities}
+```
+
+## Procedural Memory Creation Sequence
+
+This diagram shows the specific workflow for creating procedural memories:
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Memory as Memory Controller
+    participant LLM as LLM Provider
+    participant Storage as SQLite Storage
+    participant VectorStore as Vector Store
+    
+    Client->>Memory: add(messages, agent_id, memory_type="procedural_memory")
+    Memory->>Memory: validate_procedural_memory_params()
+    Memory->>Memory: _create_procedural_memory()
+    
+    Memory->>LLM: generate_procedural_prompt()
+    LLM-->>Memory: procedural_prompt
+    
+    Memory->>LLM: extract_procedural_steps(messages, prompt)
+    LLM-->>Memory: procedural_facts
+    
+    loop For each procedural fact
+        Memory->>Memory: create_memory_item(fact, "procedural")
+        Memory->>Storage: store_procedural_metadata()
+        Storage-->>Memory: storage_result
+        
+        Memory->>Memory: embed_procedural_step()
+        Memory->>VectorStore: insert_procedural_vector()
+        VectorStore-->>Memory: vector_result
+    end
+    
+    Memory->>Memory: _format_procedural_response()
+    Memory-->>Client: procedural_memory_results
+```
+
+## Update Memory Sequence
+
+This sequence illustrates the complex process of updating existing memories:
+
+```mermaid
+sequenceDiagram
+    participant Memory as Memory Controller
+    participant LLM as LLM Provider
+    participant VectorStore as Vector Store
+    participant GraphMemory as Graph Memory
+    participant Storage as SQLite Storage
+    
+    Memory->>Memory: update_memory(existing_memory, new_info)
+    Memory->>LLM: generate_update_prompt(existing, new)
+    LLM-->>Memory: update_instructions
+    
+    Memory->>LLM: determine_update_type(instructions)
+    LLM-->>Memory: update_type
+    
+    alt Update Type: MODIFY
+        Memory->>LLM: modify_memory_content()
+        LLM-->>Memory: modified_content
+        Memory->>VectorStore: update_vector(memory_id, new_embedding)
+        VectorStore-->>Memory: update_result
+        Memory->>Storage: update_metadata()
+        Storage-->>Memory: metadata_result
+    else Update Type: DELETE
+        Memory->>VectorStore: delete(memory_id)
+        VectorStore-->>Memory: delete_result
+        Memory->>GraphMemory: delete_related_entities()
+        GraphMemory-->>Memory: graph_delete_result
+        Memory->>Storage: mark_deleted()
+        Storage-->>Memory: deletion_result
+    else Update Type: ADD_NEW
+        Memory->>Memory: create_new_memory(new_content)
+        Note over Memory: Follows standard add sequence
+    end
+    
+    Memory-->>Memory: update_response
+```
+
+## Error Handling and Recovery Sequence
+
+This diagram shows the system's approach to error handling and recovery:
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Memory as Memory Controller
+    participant ComponentFactory as Component Factory
+    participant ExternalService as External Service
+    participant Fallback as Fallback Handler
+    participant Logger as Error Logger
+    
+    Client->>Memory: perform_operation()
+    Memory->>ComponentFactory: get_component(provider)
+    ComponentFactory-->>Memory: component_instance
+    
+    Memory->>ExternalService: execute_operation()
+    
+    alt Success Path
+        ExternalService-->>Memory: success_result
+        Memory-->>Client: operation_result
+    else Error Path
+        ExternalService-->>Memory: error_response
+        Memory->>Logger: log_error(error_details)
+        Memory->>Fallback: handle_error(error_type)
+        
+        alt Retryable Error
+            Fallback->>Memory: retry_with_backoff()
+            Memory->>ExternalService: retry_operation()
+            ExternalService-->>Memory: retry_result
+        else Provider Failure
+            Fallback->>ComponentFactory: get_fallback_provider()
+            ComponentFactory-->>Fallback: fallback_component
+            Fallback->>Memory: use_fallback_component()
+        else Fatal Error
+            Fallback->>Memory: return_error_response()
+        end
+        
+        Memory-->>Client: error_or_fallback_result
+    end
+```
+
+## Multi-Session Context Management
+
+This sequence shows how the system manages context across multiple sessions:
+
+```mermaid
+sequenceDiagram
+    participant SessionA as Session A (User)
+    participant SessionB as Session B (Agent)
+    participant SessionC as Session C (Run)
+    participant Memory as Memory Controller
+    participant ContextManager as Context Manager
+    participant Storage as Storage Layer
+    
+    SessionA->>Memory: add_memory(user_id="alice")
+    Memory->>ContextManager: build_context(user_id="alice")
+    ContextManager->>Storage: get_user_memories("alice")
+    Storage-->>ContextManager: alice_memories
+    ContextManager-->>Memory: user_context
+    Memory->>Storage: store_memory(user_scope)
+    Storage-->>Memory: storage_result
+    Memory-->>SessionA: success
+    
+    SessionB->>Memory: add_memory(agent_id="assistant", user_id="alice")
+    Memory->>ContextManager: build_context(agent_id="assistant", user_id="alice")
+    ContextManager->>Storage: get_memories(multi_scope)
+    Storage-->>ContextManager: combined_memories
+    ContextManager-->>Memory: combined_context
+    Memory->>Storage: store_memory(agent_scope)
+    Storage-->>Memory: storage_result
+    Memory-->>SessionB: success
+    
+    SessionC->>Memory: search(run_id="task_123", user_id="alice")
+    Memory->>ContextManager: build_search_context(run_id, user_id)
+    ContextManager->>Storage: search_across_scopes()
+    Storage-->>ContextManager: scoped_results
+    ContextManager-->>Memory: filtered_context
+    Memory-->>SessionC: scoped_memories
+```
+
+## Data Consistency and Transaction Flow
+
+This final sequence diagram illustrates how the system maintains data consistency across multiple storage backends:
+
+```mermaid
+sequenceDiagram
+    participant Memory as Memory Controller
+    participant TransactionManager as Transaction Manager
+    participant VectorStore as Vector Store
+    participant GraphStore as Graph Store
+    participant SQLiteStore as SQLite Store
+    participant Validator as Data Validator
+    
+    Memory->>TransactionManager: begin_transaction()
+    TransactionManager->>TransactionManager: generate_transaction_id()
+    
+    Memory->>Validator: validate_input_data()
+    Validator-->>Memory: validation_result
+    
+    alt Validation Success
+        par Vector Transaction
+            TransactionManager->>VectorStore: begin_vector_operation(tx_id)
+            VectorStore->>VectorStore: prepare_vector_changes()
+            VectorStore-->>TransactionManager: vector_prepared
+        and Graph Transaction
+            TransactionManager->>GraphStore: begin_graph_operation(tx_id)
+            GraphStore->>GraphStore: prepare_graph_changes()
+            GraphStore-->>TransactionManager: graph_prepared
+        and Metadata Transaction
+            TransactionManager->>SQLiteStore: begin_metadata_operation(tx_id)
+            SQLiteStore->>SQLiteStore: prepare_metadata_changes()
+            SQLiteStore-->>TransactionManager: metadata_prepared
+        end
+        
+        TransactionManager->>TransactionManager: validate_cross_store_consistency()
+        
+        alt Consistency Check Pass
+            par Commit Phase
+                TransactionManager->>VectorStore: commit(tx_id)
+                VectorStore-->>TransactionManager: vector_committed
+            and
+                TransactionManager->>GraphStore: commit(tx_id)
+                GraphStore-->>TransactionManager: graph_committed
+            and
+                TransactionManager->>SQLiteStore: commit(tx_id)
+                SQLiteStore-->>TransactionManager: metadata_committed
+            end
+            TransactionManager-->>Memory: transaction_success
+        else Consistency Check Fail
+            par Rollback Phase
+                TransactionManager->>VectorStore: rollback(tx_id)
+                VectorStore-->>TransactionManager: vector_rolled_back
+            and
+                TransactionManager->>GraphStore: rollback(tx_id)
+                GraphStore-->>TransactionManager: graph_rolled_back
+            and
+                TransactionManager->>SQLiteStore: rollback(tx_id)
+                SQLiteStore-->>TransactionManager: metadata_rolled_back
+            end
+            TransactionManager-->>Memory: transaction_failed
+        end
+    else Validation Failure
+        TransactionManager-->>Memory: validation_error
+    end
+```
+
+These sequence diagrams capture the intricate data flow patterns that enable Mem0's emergent cognitive behaviors. Each sequence represents a critical pathway in the neural-symbolic integration that makes the system more than the sum of its individual components.
